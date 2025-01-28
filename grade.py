@@ -149,16 +149,31 @@ def main():
             class_sec = d[section_col]
             first = d[firstname_col]
             last = d[lastname_col]
+            early = False
+            late = False
+            half_credit = False
             tmpgrade = 0
             if submission_datetime >= student_times[email][0][0] and submission_datetime <= student_times[email][0][1]:
                 tmpgrade = grade
             elif submission_datetime >= student_times[email][1][0] and submission_datetime <= student_times[email][1][1]:
                 tmpgrade = grade * 0.5
+                half_credit = True
+            elif submission_datetime > student_times[email][1][1]:
+                late = True
+            else:
+                early = True
             if email not in student_grades:
-                student_grades[email] = [last, first, email, class_sec, submission_datetime, tmpgrade]
+                student_grades[email] = [last, first, email, class_sec, submission_datetime, tmpgrade, 0, 0, 0]
             else:
                 if student_grades[email][5] < tmpgrade:
-                    student_grades[email] = [last, first, email, class_sec, submission_datetime, tmpgrade]
+                    student_grades[email][4] = submission_datetime
+                    student_grades[email][5] = tmpgrade
+                if early:
+                    student_grades[email][6] += 1
+                if half_credit:
+                    student_grades[email][7] += 1
+                if late:
+                    student_grades[email][8] += 1
                     
 
     grades_list = []
@@ -176,7 +191,15 @@ def main():
         outfile = open(f"./{ps_num}/{s}.csv", "w")
         for g in grades_list:
             if g[3] == s:
-                outfile.write(f"{g[0]},{g[1]},{g[2]},{g[4]},{g[5]}\n")
+                outfile.write(f"{g[0]},{g[1]},{g[2]},{g[4]},{g[5]},")
+                if g[6] > 0:
+                    outfile.write(f"{g[6]} Early submissions,")
+                if g[7] > 0:
+                    outfile.write(f"{g[7]} Half-credit submissions,")
+                if g[8] > 0:
+                    outfile.write(f"{g[8]} Late submissions,")
+                outfile.write("\n")
+
 
 
 if __name__ == "__main__":

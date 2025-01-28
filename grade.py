@@ -100,15 +100,15 @@ def main():
             if d[attend_col] == "0" or d[attend_col] == "":
                 student_times[d[3]][0][1] = student_times[d[3]][0][0]
             
-    print(student_times)
-
+    lastname_col = 0
+    firstname_col = 0
     email_col = 0
     grade_col = 0
     submit_datetime_col = 0
     section_col = 0
     submissions_filename = 0
 
-    student_grades = []
+    student_grades = dict()
 
     for f in os.listdir(f"./{ps_num}"):
         if "zylab" in f:
@@ -137,18 +137,48 @@ def main():
             grade_col = d.index("score")
             submit_datetime_col = d.index("date_submitted(UTC)")
             section_col = d.index("class_section")
+            lastname_col= d.index("last_name")
+            firstname_col= d.index("first_name")
         else:
-            email = d[email_col]
+            email = d[email_col].lower()
+            if email not in student_times:
+                print(f"Skipping {email}")
+                continue
             grade = float(d[grade_col])
             submission_datetime = datetime.datetime.strptime(d[submit_datetime_col], "%Y-%m-%d %H:%M:%S")
+            class_sec = d[section_col]
+            first = d[firstname_col]
+            last = d[lastname_col]
+            tmpgrade = 0
+            if submission_datetime >= student_times[email][0][0] and submission_datetime <= student_times[email][0][1]:
+                tmpgrade = grade
+            elif submission_datetime >= student_times[email][1][0] and submission_datetime <= student_times[email][1][1]:
+                tmpgrade = grade * 0.5
+            if email not in student_grades:
+                student_grades[email] = [last, first, email, class_sec, submission_datetime, tmpgrade]
+            else:
+                if student_grades[email][5] < tmpgrade:
+                    student_grades[email] = [last, first, email, class_sec, submission_datetime, tmpgrade]
+                    
 
+    grades_list = []
+    for g in student_grades:
+        grades_list.append(student_grades[g])
+    
+    print(grades_list)
+    grades_list.sort(key=lambda x: (x[3],x[0],x[1]))
+    
+    class_sections = []
+    for g in grades_list:
+        if g[3] not in class_sections:
+            class_sections.append(g[3])
 
-    #Read class section rosters for generating final tables to input into Moodle
-    rosters = dict()
-    for file in os.listdir():
-        if "roster" in file:
-            section = int(file.split("_")[1].split(".")[0])
-            rosters[section] = np.genfromtxt(file, delimiter=",", dtype=str, skip_header=True)
+    for s in class_sections:
+        outfile = open(f"./{ps_num}/{s}.csv", "w")
+        for g in grades_list:
+            if g[3] == s:
+                outfile.write(f"{g[0]},{g[1]},{g[2]},{g[4]},{g[5]}\n")
+
 
 if __name__ == "__main__":
     main()

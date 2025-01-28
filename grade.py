@@ -85,7 +85,7 @@ def main():
 
     current_sec = 0
     attend_col = 0
-    student_times = dict() #student email is the key
+    student_times = dict() #student email is the key, format is [[full credit start, full credit end], [half credit start, half credit end]]
 
     for line in attend_str.split("\n"):
         d = line.split(",")
@@ -165,7 +165,6 @@ def main():
     for g in student_grades:
         grades_list.append(student_grades[g])
     
-    print(grades_list)
     grades_list.sort(key=lambda x: (x[3],x[0],x[1]))
     
     class_sections = []

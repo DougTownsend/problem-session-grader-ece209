@@ -98,7 +98,7 @@ def main():
             if d[attend_col] == "2":
                 student_times[d[3]][0][1] = student_times[d[3]][1][1]
             if d[attend_col] == "0" or d[attend_col] == "":
-                student_times[d[3]][0][1] = student_times[d[3]][0][0]
+                student_times[d[3]][0][1] = student_times[d[3]][0][0] - datetime.timedelta(seconds=1)
             
     lastname_col = 0
     firstname_col = 0

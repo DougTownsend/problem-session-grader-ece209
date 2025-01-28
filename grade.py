@@ -105,14 +105,42 @@ def main():
     email_col = 0
     grade_col = 0
     submit_datetime_col = 0
-    submissions_file = 0
+    section_col = 0
+    submissions_filename = 0
+
+    student_grades = []
 
     for f in os.listdir(f"./{ps_num}"):
         if "zylab" in f:
-            submissions_file = f"./{ps_num}/{f}"
+            submissions_filename = f"./{ps_num}/{f}"
     
-    print(submissions_file)
 
+
+    sub_file = open(submissions_filename, "r")
+    for line in sub_file.read().splitlines():
+        #Remove the commas that are between quotation marks
+        splitquote = line.split("\"")
+        i = 1
+        while i < len(splitquote):
+            splitquote[i] = splitquote[i].replace(",", "")
+            i += 2
+        fixedline = "".join(splitquote)
+        d = fixedline.split(",")
+
+        #Skip the solution line
+        if d[5] == "Solution":
+            continue
+
+        #Get the columns for the needed data
+        if d[0] == "zybook_code":
+            email_col = d.index("email")
+            grade_col = d.index("score")
+            submit_datetime_col = d.index("date_submitted(UTC)")
+            section_col = d.index("class_section")
+        else:
+            email = d[email_col]
+            grade = float(d[grade_col])
+            submission_datetime = datetime.datetime.strptime(d[submit_datetime_col], "%Y-%m-%d %H:%M:%S")
 
 
     #Read class section rosters for generating final tables to input into Moodle

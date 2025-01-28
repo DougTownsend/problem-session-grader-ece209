@@ -1,4 +1,4 @@
-#ECE 209 Problem Session Grader
+# ECE 209 Problem Session Grader
 
 This currently only works for the old style zylabs. I will modify this to add support for the new style once we get to a problem session that uses it.
 

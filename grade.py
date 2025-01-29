@@ -199,6 +199,7 @@ def main():
                 if g[8] > 0:
                     outfile.write(f"{g[8]} Late submissions,")
                 outfile.write("\n")
+        outfile.close()
 
 
 

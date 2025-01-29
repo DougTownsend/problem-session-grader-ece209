@@ -4,6 +4,8 @@ This currently only works for the old style zylabs. I will modify this to add su
 
 If students get permission to go to a different section, those grades must be checked manually.
 
+The psX.txt files are only there so that the directories show up in the git repo.
+
 1. Export the attendance sheet to CSV and place in main directory (same directory as grade.py)
 2. Download the submission log from zybooks. For the old style zylabs that do not have the built in VSCode environment
 open the lab section in zybooks, go to "Lab statistics and submissions" and click "Download log of all runs." For

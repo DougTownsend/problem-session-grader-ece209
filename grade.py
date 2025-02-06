@@ -64,11 +64,18 @@ def main():
                 sec_times[int(sec)][1] -= datetime.timedelta(hours=1)
             elif monday < dst_end and monday + sec_times[int(sec)][1] > dst_end:
                 sec_times[int(sec)][1] += datetime.timedelta(hours=1)
+            sec_times[int(sec)][2] += datetime.timedelta(days=7)
+            if monday < dst_start and monday + sec_times[int(sec)][2] > dst_start:
+                sec_times[int(sec)][2] -= datetime.timedelta(hours=1)
+            elif monday < dst_end and monday + sec_times[int(sec)][2] > dst_end:
+                sec_times[int(sec)][2] += datetime.timedelta(hours=1)
     
     for sec in sections:
         sec_times[sec][0] = monday + sec_times[sec][0]
         sec_times[sec][1] = monday + sec_times[sec][1]
         sec_times[sec][2] = monday + sec_times[sec][2]
+
+    print(sec_times)
 
     ps_num = input("Which problem session was this (1-6)?: ")
     ps_num = "PS" + ps_num

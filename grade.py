@@ -75,8 +75,6 @@ def main():
         sec_times[sec][1] = monday + sec_times[sec][1]
         sec_times[sec][2] = monday + sec_times[sec][2]
 
-    print(sec_times)
-
     ps_num = input("Which problem session was this (1-6)?: ")
     ps_num = "PS" + ps_num
 
@@ -116,43 +114,69 @@ def main():
     submissions_filename = 0
 
     student_grades = dict()
+    vscode_zylab = False
 
     for f in os.listdir(f"./{ps_num}"):
         if "zylab" in f:
             submissions_filename = f"./{ps_num}/{f}"
-    
+        elif "student_activity" in f:
+            submissions_filename = f"./{ps_num}/{f}"
+            vscode_zylab = True
 
-
+    header = True
+    valid = True
     sub_file = open(submissions_filename, "r")
     for line in sub_file.read().splitlines():
         #Remove the commas that are between quotation marks
-        splitquote = line.split("\"")
-        i = 1
-        while i < len(splitquote):
-            splitquote[i] = splitquote[i].replace(",", "")
-            i += 2
-        fixedline = "".join(splitquote)
+        fixedline = 0
+        if not vscode_zylab:
+            splitquote = line.split("\"")
+            i = 1
+            while i < len(splitquote):
+                splitquote[i] = splitquote[i].replace(",", "")
+                i += 2
+            fixedline = "".join(splitquote)
+        else:
+            fixedline = line
         d = fixedline.split(",")
 
         #Skip the solution line
-        if d[5] == "Solution":
-            continue
+        if not vscode_zylab:
+            if d[5] == "Solution":
+                continue
 
         #Get the columns for the needed data
-        if d[0] == "zybook_code":
+        if d[0] == "zybook_code" and not vscode_zylab:
             email_col = d.index("email")
             grade_col = d.index("score")
             submit_datetime_col = d.index("date_submitted(UTC)")
             section_col = d.index("class_section")
             lastname_col= d.index("last_name")
             firstname_col= d.index("first_name")
+        elif vscode_zylab and header:
+            email_col = d.index("Email")
+            grade_col = d.index("Score")
+            submit_datetime_col = d.index("Date of submission")
+            section_col = d.index("Class section")
+            lastname_col= d.index("Last name")
+            firstname_col= d.index("First name")
+            header = False
+        elif vscode_zylab and not valid:
+            if len(line) > 0:
+                if line[-1] == "\"":
+                    valid = True
+            continue
         else:
+            valid = False
             email = d[email_col].lower()
             if email not in student_times:
                 print(f"Skipping {email}")
                 continue
             grade = float(d[grade_col])
-            submission_datetime = datetime.datetime.strptime(d[submit_datetime_col], "%Y-%m-%d %H:%M:%S")
+            if not vscode_zylab:
+                submission_datetime = datetime.datetime.strptime(d[submit_datetime_col], "%Y-%m-%d %H:%M:%S")
+            else:
+                submission_datetime = datetime.datetime.strptime(d[submit_datetime_col], "%Y-%m-%dT%H:%M:%SZ")
             class_sec = d[section_col]
             first = d[firstname_col]
             last = d[lastname_col]
